@@ -1,70 +1,28 @@
-# SpecsUp Deployment Guide for Vercel
+# SpecsUp Deployment Guide
 
-This project is pre-configured for full-stack deployment on [Vercel](https://vercel.com/).
-
-The setup includes:
-- **Frontend**: React + Vite SPA built to `frontend/dist`.
-- **Backend**: Python FastAPI deployed as a Vercel Serverless Function via `api/index.py`.
-- **Database**: Seeded SQLite database automatically copied to `/tmp/specsup.db` on cold start to support serverless operations.
-- **Routing**: `vercel.json` routes `/api/*` to the FastAPI backend and all other requests to the React SPA.
+SpecsUp uses a React + Vite frontend, an Express/Node.js backend, and MongoDB.
+Deploy the frontend and backend as separate services: Vercel can host the frontend,
+while the backend needs a Node.js host that supports a persistent web process.
 
 ---
 
-## Method 1: Deploy via GitHub (Recommended)
+## Deploy the backend
 
-1. **Push your code to GitHub**:
-   If not already pushed, initialize Git and push the project to a GitHub repository:
-   ```bash
-   git init
-   git add .
-   git commit -m "Deploy SpecsUp to Vercel"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/<your-repo-name>.git
-   git push -u origin main
-   ```
+1. Create a Node.js service using `backend/` as its root directory.
+2. Install dependencies with `npm install` and start the service with `npm start`.
+3. Configure `MONGO_URI`, `JWT_SECRET`, and `NODE_ENV` in the service environment.
+4. Confirm the service responds at `/api/health`.
 
-2. **Import into Vercel**:
-   - Go to [vercel.com/new](https://vercel.com/new) and log in with GitHub.
-   - Select your repository (`specsup`).
-   - In the project configuration:
-     - **Framework Preset**: Vite (detected automatically).
-     - **Root Directory**: `./` (leave default).
-     - **Build Command**: `cd frontend && npm run build` (set in `vercel.json`).
-     - **Output Directory**: `frontend/dist` (set in `vercel.json`).
-   - Click **Deploy**.
+## Deploy the frontend to Vercel
 
-3. **Done!**
-   Vercel will build your frontend and configure your FastAPI serverless function. Your app will be live at `https://<your-project>.vercel.app`.
+1. Import the repository into [Vercel](https://vercel.com/new) and set the project root to the repository root.
+2. Use the build command `cd frontend && npm run build` and output directory `frontend/dist`.
+3. Set the build-time environment variable `VITE_API_BASE_URL` to the deployed backend's base URL (no trailing slash).
+4. Deploy. The Vercel rewrite serves the frontend SPA; API requests go directly to the configured backend URL.
 
----
-
-## Method 2: Deploy via Vercel CLI
-
-1. **Install Vercel CLI**:
-   ```bash
-   npm install -g vercel
-   ```
-
-2. **Login to Vercel**:
-   ```bash
-   vercel login
-   ```
-
-3. **Deploy from project root**:
-   From `C:\Users\VANSH AIL\.gemini\antigravity\scratch\specsup`:
-   ```bash
-   vercel
-   ```
-   Follow the CLI prompts (accept default settings).
-
-4. **Deploy to Production**:
+To deploy from the command line:
    ```bash
    vercel --prod
    ```
 
----
-
-## Important Note on Serverless Database Persistence
-
-- Vercel Serverless Functions have an ephemeral filesystem. Any changes made to SQLite in `/tmp/specsup.db` during runtime are retained for active container instances, but reset when functions go cold.
-- For permanent production storage, connect an external cloud database (such as **Supabase PostgreSQL** or **Neon PostgreSQL**) by setting the `DATABASE_URL` or `SUPABASE_URL` / `SUPABASE_KEY` environment variables in your Vercel Project Dashboard.
+Use a managed MongoDB deployment for production and allow network access from the backend host.

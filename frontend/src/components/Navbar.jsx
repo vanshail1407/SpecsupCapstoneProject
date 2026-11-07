@@ -1,10 +1,26 @@
 ﻿import React, { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Glasses, User, LogOut, LogIn, Menu, X, Shield, Activity, History, FileText } from 'lucide-react';
+import {
+  Activity,
+  CalendarDays,
+  Glasses,
+  History,
+  Home,
+  LogOut,
+  LogIn,
+  Menu,
+  Package,
+  ScanEye,
+  Shield,
+  UserRound,
+  UsersRound,
+  X,
+} from 'lucide-react';
 
 export default function Navbar() {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -14,76 +30,135 @@ export default function Navbar() {
     setMobileMenuOpen(false);
   };
 
-  const navLinkClass = ({ isActive }) =>
-    `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-      isActive
-        ? 'bg-sky-50 text-sky-700 font-semibold'
-        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+  const iconLinkClass = (isActive) =>
+    `group inline-flex h-10 items-center justify-center gap-2 px-2.5 text-[10px] font-medium uppercase tracking-[0.12em] transition-colors ${
+      isActive ? 'bg-stone-100 text-stone-950' : 'text-stone-500 hover:bg-stone-50 hover:text-stone-950'
     }`;
 
+  const iconLabelClass = (isActive) =>
+    `whitespace-nowrap ${isActive ? 'inline-flex' : 'hidden group-hover:inline-flex group-focus-visible:inline-flex'}`;
+
   const mobileNavLinkClass = ({ isActive }) =>
-    `block px-3 py-2 rounded-md text-base font-medium ${
+    `block px-3 py-2 text-sm font-medium ${
       isActive
-        ? 'bg-sky-50 text-sky-700 font-semibold'
-        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+        ? 'text-stone-950'
+        : 'text-stone-500 hover:bg-stone-50 hover:text-stone-950'
     }`;
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <header className="sticky top-0 z-40 border-b border-stone-200 bg-white">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-8 lg:px-12">
+        <div className="flex h-[68px] items-center justify-between">
           {/* Logo & Brand */}
-          <Link to="/" className="flex items-center space-x-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-teal-500 flex items-center justify-center text-white shadow-sm group-hover:shadow transition-shadow">
-              <Glasses className="w-6 h-6" />
+          <Link to="/" className="group flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center text-stone-900 transition-transform group-hover:scale-105">
+              <Glasses className="h-7 w-7" strokeWidth={1.5} />
             </div>
             <div>
-              <span className="text-xl font-bold tracking-tight text-slate-900 group-hover:text-sky-700 transition-colors">
-                Specs<span className="text-sky-600">Up</span>
+              <span className="text-lg font-semibold tracking-[-0.06em] text-stone-900">
+                SpecsUp
               </span>
-              <span className="block text-[10px] uppercase tracking-wider font-semibold text-slate-600 -mt-1">
-                Optical Care
+              <span className="mt-[-2px] block text-[8px] font-medium uppercase tracking-[0.22em] text-stone-500">
+                Optical studio
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-1">
-            <NavLink to="/" end className={navLinkClass}>
-              Home
-            </NavLink>
+          <nav aria-label="Main navigation" className="hidden items-center gap-1 md:flex">
+            <Link
+              to="/"
+              aria-label="Home"
+              title="Home"
+              className={iconLinkClass(location.pathname === '/' && !location.hash)}
+            >
+              <Home className="h-4 w-4 shrink-0" />
+              <span className={iconLabelClass(location.pathname === '/' && !location.hash)}>Home</span>
+            </Link>
+            <Link
+              to="/#frames-section"
+              aria-label="Collection"
+              title="Collection"
+              className={iconLinkClass(location.pathname === '/' && location.hash === '#frames-section')}
+            >
+              <Package className="h-4 w-4 shrink-0" />
+              <span className={iconLabelClass(location.pathname === '/' && location.hash === '#frames-section')}>
+                Collection
+              </span>
+            </Link>
+            <Link
+              to="/#recommendations-section"
+              aria-label="Optical care"
+              title="Optical care"
+              className={iconLinkClass(location.pathname === '/' && location.hash === '#recommendations-section')}
+            >
+              <ScanEye className="h-4 w-4 shrink-0" />
+              <span className={iconLabelClass(location.pathname === '/' && location.hash === '#recommendations-section')}>
+                Optical care
+              </span>
+            </Link>
 
             {isAuthenticated && !isAdmin && (
               <>
-                <NavLink to="/analysis" className={navLinkClass}>
-                  Prescription Analysis
+                <NavLink to="/analysis" aria-label="Prescription analysis" title="Prescription analysis" className={({ isActive }) => iconLinkClass(isActive)}>
+                  {({ isActive }) => (
+                    <>
+                      <Activity className="h-4 w-4 shrink-0" />
+                      <span className={iconLabelClass(isActive)}>Analysis</span>
+                    </>
+                  )}
                 </NavLink>
-                <NavLink to="/history" className={navLinkClass}>
-                  Prescription History
+                <NavLink to="/history" aria-label="Prescription history" title="Prescription history" className={({ isActive }) => iconLinkClass(isActive)}>
+                  {({ isActive }) => (
+                    <>
+                      <History className="h-4 w-4 shrink-0" />
+                      <span className={iconLabelClass(isActive)}>History</span>
+                    </>
+                  )}
                 </NavLink>
-                <NavLink to="/profile" className={navLinkClass}>
-                  Profile
+                <NavLink to="/profile" aria-label="Profile" title="Profile" className={({ isActive }) => iconLinkClass(isActive)}>
+                  {({ isActive }) => (
+                    <>
+                      <UserRound className="h-4 w-4 shrink-0" />
+                      <span className={iconLabelClass(isActive)}>Profile</span>
+                    </>
+                  )}
                 </NavLink>
               </>
             )}
 
             {isAdmin && (
               <>
-                <NavLink to="/admin/products" className={navLinkClass}>
-                  Products
+                <NavLink to="/admin/products" aria-label="Products" title="Products" className={({ isActive }) => iconLinkClass(isActive)}>
+                  {({ isActive }) => (
+                    <>
+                      <Package className="h-4 w-4 shrink-0" />
+                      <span className={iconLabelClass(isActive)}>Products</span>
+                    </>
+                  )}
                 </NavLink>
-                <NavLink to="/admin/customers" className={navLinkClass}>
-                  Customers
+                <NavLink to="/admin/customers" aria-label="Customers" title="Customers" className={({ isActive }) => iconLinkClass(isActive)}>
+                  {({ isActive }) => (
+                    <>
+                      <UsersRound className="h-4 w-4 shrink-0" />
+                      <span className={iconLabelClass(isActive)}>Customers</span>
+                    </>
+                  )}
                 </NavLink>
-                <NavLink to="/admin/reservations" className={navLinkClass}>
-                  Reservations
+                <NavLink to="/admin/reservations" aria-label="Reservations" title="Reservations" className={({ isActive }) => iconLinkClass(isActive)}>
+                  {({ isActive }) => (
+                    <>
+                      <CalendarDays className="h-4 w-4 shrink-0" />
+                      <span className={iconLabelClass(isActive)}>Reservations</span>
+                    </>
+                  )}
                 </NavLink>
               </>
             )}
           </nav>
 
           {/* User Status & Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden items-center gap-3 md:flex">
             {isAuthenticated ? (
               <div className="flex items-center space-x-3">
                 <div className="text-right">
@@ -93,13 +168,13 @@ export default function Navbar() {
                         <Shield className="w-3 h-3 mr-1" /> Admin
                       </span>
                     )}
-                    <span className="text-sm font-semibold text-slate-800">{user?.name}</span>
+                    <span className="text-sm font-medium text-stone-800">{user?.name}</span>
                   </div>
-                  <span className="text-xs text-slate-600">{user?.email}</span>
+                  <span className="text-xs text-stone-500">{user?.email}</span>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="inline-flex items-center px-3 py-1.5 border border-slate-300 rounded-lg text-xs font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+                  className="inline-flex items-center border border-stone-300 px-3 py-2 text-[10px] font-medium uppercase tracking-wider text-stone-700 transition-colors hover:bg-stone-100"
                   title="Logout"
                 >
                   <LogOut className="w-3.5 h-3.5 mr-1" />
@@ -110,14 +185,14 @@ export default function Navbar() {
               <div className="flex items-center space-x-2">
                 <Link
                   to="/login"
-                  className="inline-flex items-center px-3.5 py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="inline-flex items-center border border-stone-300 px-4 py-2.5 text-[10px] font-medium uppercase tracking-[0.12em] text-stone-700 transition-colors hover:bg-stone-100"
                 >
-                  <LogIn className="w-4 h-4 mr-1.5 text-slate-600" />
+                  <LogIn className="mr-1.5 h-4 w-4 text-stone-600" />
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="inline-flex items-center px-3.5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm"
+                  className="inline-flex items-center bg-stone-900 px-4 py-2.5 text-[10px] font-medium uppercase tracking-[0.12em] text-white transition-colors hover:bg-stone-700"
                 >
                   Register
                 </Link>
@@ -126,10 +201,10 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+          <div className="flex items-center md:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+              className="p-2 text-stone-600 hover:bg-stone-100 hover:text-stone-950"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -139,7 +214,21 @@ export default function Navbar() {
 
       {/* Mobile Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-4 space-y-1 shadow-lg">
+        <div className="space-y-1 border-t border-stone-200 bg-white px-4 pb-4 pt-2 shadow-lg md:hidden">
+          <Link
+            to="/#frames-section"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-50"
+          >
+            Collection
+          </Link>
+          <Link
+            to="/#recommendations-section"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-50"
+          >
+            Optical care
+          </Link>
           <NavLink
             to="/"
             end

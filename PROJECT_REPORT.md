@@ -3,7 +3,7 @@
 
 **Project Title**: SpecsUp — Optical Shop Inventory and Clinical Eye-Prescription Trend Analysis System  
 **Discipline**: Computer Science & Engineering / Information Technology  
-**Architecture**: Decoupled 3-Tier Web Architecture (React 19 + FastAPI + PostgreSQL/Supabase)  
+**Architecture**: Decoupled 3-Tier Web Architecture (React + Express.js + MongoDB)  
 **Target Domain**: Healthcare Informatics, Optical Retail & Vision Care  
 
 ---
@@ -12,7 +12,7 @@
 
 Vision correction and optical retail operations in local communities often suffer from fragmented record-keeping. Patients frequently misplace physical paper prescription slips, leading to missed follow-up appointments and unmonitored refractive shifts such as progressive myopia. Concurrently, small optical establishments face challenges synchronizing in-store frame stock with customer reservations without resorting to complex, high-overhead e-commerce platforms.
 
-This capstone project presents **SpecsUp**, a full-stack, cloud-integrated web application designed to solve these twin challenges. The system provides local optical storefront operations—enabling authenticated customers to browse in-store frame inventory and execute atomic pre-bookings—alongside a proprietary clinical prescription trend analysis and recommendation engine. Built upon FastAPI, React 19, and PostgreSQL, the platform processes longitudinal Spherical (SPH) and Cylindrical (CYL) Diopter measurements across consecutive examinations. Utilizing calendar-accurate elapsed time differencing ($\Delta t = \text{days} / 365.25$), the engine calculates annualized rates of ocular change, classifies vision progression into deterministic categories (*Stable*, *Increasing*, *Decreasing*), dynamically projects recommended follow-up examination dates, and generates standardized medical prescription history reports via ReportLab. Automated testing demonstrates 100% test coverage across authentication, stock concurrency, and trend analysis.
+This capstone project presents **SpecsUp**, a full-stack, cloud-integrated web application designed to solve these twin challenges. The system provides local optical storefront operations—enabling authenticated customers to browse in-store frame inventory and execute atomic pre-bookings—alongside a proprietary clinical prescription trend analysis and recommendation engine. Built with React, Express.js, and MongoDB, the platform processes longitudinal Spherical (SPH) and Cylindrical (CYL) Diopter measurements across consecutive examinations. Utilizing calendar-accurate elapsed time differencing ($\Delta t = \text{days} / 365.25$), the engine calculates annualized rates of ocular change, classifies vision progression into deterministic categories (*Stable*, *Increasing*, *Decreasing*), dynamically projects recommended follow-up examination dates, and generates prescription history PDFs via PDFKit.
 
 ---
 
@@ -45,22 +45,22 @@ The project strictly implements a decoupled 3-tier architecture:
 [Presentation Tier]        React 19 + Vite + Tailwind CSS v4 + Lucide React
                                        │
                                        ▼  REST APIs + Bearer Session Token
-[Application Tier]         FastAPI (Python 3.14)
-                           ├── Auth Dependency Injection (require_admin)
+[Application Tier]         Express.js (Node.js)
+                           ├── JWT Authentication & Role Middleware
                            ├── Atomic Inventory Pre-booking Engine
                            ├── DSA Prescription Trend & Checkup Engine
-                           └── ReportLab Medical PDF Generator
+                           └── PDFKit Medical PDF Generator
                                        │
-                                       ▼  PostgreSQL Adapter
-[Data Tier]                Supabase PostgreSQL / SQLite Local Engine
+                                       ▼  Mongoose ODM
+[Data Tier]                MongoDB
 ```
 
 ### 2.2 Technology Stack Justification
 - **React 19 & Vite**: Provides lightning-fast Hot Module Replacement (HMR), component-driven UI modularity, and client-side route protection.
 - **Tailwind CSS v4**: Utility-first responsive styling ensuring a modern, accessible healthcare design without bloated UI frameworks.
-- **FastAPI (Python)**: High-performance asynchronous REST framework utilizing Pydantic v2 for automatic schema validation and type safety.
-- **Python ReportLab**: Generates high-fidelity, printable PDF documents directly in memory without headless browser dependencies.
-- **PostgreSQL / Supabase**: Enterprise-grade relational database guaranteeing ACID compliance, foreign key constraints, and transactional consistency.
+- **Express.js (Node.js)**: REST API framework with middleware for request handling, authentication, and authorization.
+- **PDFKit**: Generates printable prescription history PDFs directly in memory.
+- **MongoDB / Mongoose**: Document database and ODM for storing users, frames, prescriptions, and reservations.
 
 ---
 

@@ -7,29 +7,26 @@ This document prepares students to answer technical, algorithmic, and architectu
 ### Q1: What is the core architecture of SpecsUp, and how does data flow between tiers?
 **Answer**:
 SpecsUp is architected as a decoupled 3-tier client-server application:
-1. **Presentation Layer (React + Vite + Tailwind CSS)**: Renders the responsive UI and handles route protection. User actions trigger asynchronous fetch calls to FastAPI via REST endpoints with a bearer session token.
-2. **Application & Business Logic Layer (FastAPI + Python)**: Validates incoming payloads with Pydantic, validates user identity and role (`admin` vs `customer`), coordinates database operations, and executes the core algorithmic trend and recommendation logic.
-3. **Data Tier (PostgreSQL / Supabase)**: Relational schema comprising `users`, `frames`, `reservations`, and `prescriptions` with strict foreign key constraints and transactional integrity.
+1. **Presentation Layer (React + Vite)**: Renders the UI and handles route protection. User actions call the Express REST API with a bearer JWT.
+2. **Application & Business Logic Layer (Express.js + Node.js)**: Validates requests, authenticates users and roles, coordinates database operations, and runs trend and recommendation logic.
+3. **Data Tier (MongoDB)**: Mongoose models store users, frames, reservations, and prescriptions.
 
 ---
 
-### Q2: How did you implement authentication, and why avoid JWT or OAuth?
+### Q2: How did you implement JWT authentication?
 **Answer**:
-In accordance with capstone specifications prioritizing clarity, demonstrable code, and academic understandability:
-- We avoided bloated third-party authentication infrastructure (OAuth, Refresh Tokens, Redis session stores) that obscure core application logic.
-- We implemented a secure, lightweight session token system:
-  1. Passwords are salted and hashed using standard library SHA-256 (`hashlib`).
-  2. Upon login, the backend verifies the hash, checks the user role, generates a unique UUID session token, and records it in the database.
+1. Passwords are hashed with bcrypt before storage.
+2. On login, the backend verifies the password and issues a signed JWT.
   3. Every subsequent API request passes `Authorization: Bearer <token>`.
-  4. FastAPI dependency injection (`require_admin` / `get_current_user`) resolves the user and strictly enforces role permissions on the backend.
-  5. A customer trying to execute admin endpoints receives an immediate `403 Forbidden` response.
+4. Express middleware verifies the token and restricts admin endpoints to users with the admin role.
+5. A customer trying to execute admin endpoints receives a `403 Forbidden` response.
 
 ---
 
 ### Q3: Explain the Prescription Trend Analysis Algorithm in detail.
 **Answer**:
-Located in `backend/app/algorithms/prescription_analysis.py`:
-1. **Chronological Sorting**: Retrieves all historical prescriptions for the user and sorts them ascending by `checkup_date` using Python’s **TimSort** ($O(N \log N)$).
+Located in `backend/utils/prescriptionAnalysis.js`:
+1. **Chronological Sorting**: Orders prescriptions ascending by `checkup_date` with JavaScript array sorting.
 2. **Boundary Condition**: If records $< 2$, returns `insufficient_data` status immediately (academic integrity: never interpolate or fabricate fake trends).
 3. **True Elapsed Time**: Does not assume checkups are exactly 1 year apart. Calculates actual calendar differences:
    $$\Delta t = \frac{\text{Days}(Date_{i+1} - Date_i)}{365.25}$$
@@ -64,7 +61,7 @@ The next examination date is **never hard-coded**. It is computed dynamically vi
 1. **Dynamic Arrays / Lists**: Stores prescription and frame records in memory ($O(1)$ amortized append).
 2. **Hash Tables / Dictionaries**: Stores structured optical measurements ($O(1)$ average lookup by key).
 3. **Two-Pointer Iteration (Sliding Window)**: Traverses consecutive checkups $(i, i+1)$ in $O(N)$ linear time.
-4. **Sorting (TimSort)**: Guarantees strict temporal order in $O(N \log N)$ time and $O(N)$ space.
+4. **Sorting**: Sorts records by date before the linear pass through consecutive checkups.
 5. Overall algorithmic complexity for analyzing $N$ checkups is $O(N \log N)$ due to date sorting, which is virtually instantaneous for clinical histories ($N < 100$).
 
 ---
@@ -73,13 +70,8 @@ The next examination date is **never hard-coded**. It is computed dynamically vi
 **Answer**:
 To prevent race conditions where two customers reserve the final unit simultaneously:
 1. We **do not rely on client-side state** or separate un-isolated check and update statements.
-2. In `backend/app/database/connection.py`, the `atomic_prebook()` routine uses an atomic conditional SQL update:
-   ```sql
-   UPDATE frames
-   SET quantity = quantity - 1, updated_at = CURRENT_TIMESTAMP
-   WHERE id = :frame_id AND quantity > 0;
-   ```
-3. If `cursor.rowcount == 0`, the frame is out of stock. The database rejects the update, rolls back, and returns `400 Bad Request ("Frame is out of stock")`.
+2. In `backend/controllers/reservationController.js`, `findOneAndUpdate()` decrements stock only when the frame's quantity is greater than zero.
+3. If no frame matches, the backend checks whether the frame is missing or out of stock and returns the appropriate error.
 4. Only if the decrement succeeds does the system create the row in `reservations`.
 
 ---
@@ -96,11 +88,11 @@ To prevent race conditions where two customers reserve the final unit simultaneo
 **Answer**:
 1. The customer clicks **Download Prescription History PDF**.
 2. React triggers `GET /api/prescriptions/me/pdf` with the bearer token.
-3. FastAPI invokes `backend/app/services/pdf_service.py` powered by **Python ReportLab**.
-4. The service constructs a `SimpleDocTemplate` containing:
+3. Express invokes `backend/utils/pdfGenerator.js`, powered by **PDFKit**.
+4. The service creates a PDF containing:
    - Clinic header and generation timestamp.
    - Patient details (Name, Email, total examinations).
    - A structured clinical table of all checkups sorted **newest to oldest**.
    - Detailed Right (OD) and Left (OS) measurements: SPH, CYL, Axis, PD, and doctor notes.
    - Medical disclaimer footer.
-5. The PDF is compiled into an in-memory `io.BytesIO` binary stream and returned as `application/pdf` with a `Content-Disposition: attachment` header, triggering an instant browser file download.
+5. The PDF is streamed as `application/pdf` with a `Content-Disposition: attachment` header, triggering a browser download.

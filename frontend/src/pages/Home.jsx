@@ -7,18 +7,14 @@ import RecommendedFrameCard from '../components/RecommendedFrameCard';
 import {
   ArrowDown,
   Glasses,
-  Sparkles,
-  ShieldCheck,
   Eye,
-  SlidersHorizontal,
   Info,
   Calendar,
-  AlertCircle,
   LogIn
 } from 'lucide-react';
 
 export default function Home() {
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { isAuthenticated, isAdmin } = useAuth();
 
   // General frames state
   const [frames, setFrames] = useState([]);
@@ -107,54 +103,64 @@ export default function Home() {
   const filteredRecs = getFilteredRecommendations();
 
   return (
-    <div className="space-y-16 pb-16">
+    <div className="pb-20">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-sky-50/70 via-white to-slate-50 pt-16 pb-20 border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto space-y-6">
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-sky-100 text-sky-800 text-xs font-semibold shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-sky-600" />
-              <span>SpecsUp Optical Shop & Precision Eyecare</span>
-            </div>
+      <section className="relative isolate flex min-h-[440px] items-end overflow-hidden bg-stone-800 sm:min-h-[540px] lg:min-h-[620px]">
+        <img
+          src="https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=2200&q=85"
+          alt="Sunglasses from the SpecsUp eyewear collection"
+          className="absolute inset-0 -z-20 h-full w-full object-cover object-center"
+          fetchPriority="high"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/65 via-black/25 to-transparent" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
-              See Better. <span className="text-sky-600">Track Better.</span>
-            </h1>
-
-            <p className="text-lg sm:text-xl text-slate-600 leading-relaxed font-normal">
-              Manage your prescriptions, track changes over time, and reserve optically suitable
-              frames tailored to your exact lens power and anatomical measurements.
+        <div className="mx-auto w-full max-w-[1440px] px-6 pb-12 pt-28 text-white sm:px-10 sm:pb-16 lg:px-16 lg:pb-20">
+          <div className="max-w-2xl">
+            <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/80 sm:text-xs">
+              SpecsUp Optical · New season
             </p>
-
-            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button
-                onClick={scrollToFrames}
-                className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow group"
-              >
-                <span>Explore Frames</span>
-                <ArrowDown className="w-4 h-4 ml-2 group-hover:translate-y-0.5 transition-transform" />
-              </button>
-            </div>
+            <h1 className="max-w-xl text-4xl font-semibold uppercase leading-[0.98] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
+              See the world
+              <br />
+              in a new light.
+            </h1>
+            <p className="mt-5 max-w-md text-sm leading-6 text-white/85 sm:text-base">
+              Thoughtful frames, expert optical care, and a clearer view of your eye health.
+            </p>
+            <button
+              onClick={scrollToFrames}
+              className="group mt-8 inline-flex items-center gap-3 border border-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-white hover:text-stone-900 sm:mt-10"
+            >
+              Explore the collection
+              <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-1" />
+            </button>
+          </div>
+          <div className="mt-12 flex items-center gap-2 sm:absolute sm:bottom-10 sm:right-12 sm:mt-0">
+            <span className="h-1.5 w-6 bg-white" />
+            <span className="h-1.5 w-1.5 bg-white/50" />
+            <span className="h-1.5 w-1.5 bg-white/50" />
           </div>
         </div>
       </section>
 
-      {/* Prescription Smart Recommendations Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
-          <div>
-            <div className="flex items-center space-x-2 text-indigo-600 font-semibold text-xs uppercase tracking-wider mb-1">
-              <Eye className="w-4 h-4" />
-              <span>Optical Intelligence</span>
+      <div className="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
+        {/* Prescription Smart Recommendations Section */}
+        <section id="recommendations-section" className="scroll-mt-20 border-b border-stone-200 py-14 sm:py-20">
+          <div className="flex flex-col gap-3 border-t border-stone-200 pt-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500">
+                <Eye className="h-4 w-4" />
+                <span>Personalized optical care</span>
+              </div>
+              <h2 className="text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+                Made for your vision
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-500">
+                Discover frames matched to your prescription, fit, and everyday style.
+              </p>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
-              Recommended for Your Prescription
-            </h2>
-            <p className="text-sm text-slate-600 mt-1">
-              Curated selection prioritized by edge thickness minimization, pupillary alignment, and frame geometry.
-            </p>
           </div>
-        </div>
 
         {/* State 1: Unauthenticated */}
         {!isAuthenticated && (
@@ -341,22 +347,24 @@ export default function Home() {
             )}
           </div>
         )}
-      </section>
+        </section>
 
       {/* General Frames Showcase Section */}
-      <section id="frames-section" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-20">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+      <section id="frames-section" className="scroll-mt-20 py-14 sm:py-20">
+        <div className="mb-8 flex flex-col gap-3 border-t border-stone-200 pt-5 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="flex items-center space-x-2 text-sky-600 font-semibold text-xs uppercase tracking-wider mb-1">
-              <Glasses className="w-4 h-4" />
-              <span>Optical Shop Inventory</span>
+            <div className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500">
+              <Glasses className="h-4 w-4" />
+              <span>Find your frame</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">All Available Frames</h2>
-            <p className="text-sm text-slate-600 mt-1">
-              Explore our full in-store catalog across all sizes and designs
+            <h2 className="text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+              The collection
+            </h2>
+            <p className="mt-2 text-sm text-stone-500">
+              Explore considered styles, selected for comfort and clarity.
             </p>
           </div>
-          <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 self-start sm:self-auto">
+          <span className="self-start text-xs font-medium text-stone-500 sm:self-auto">
             {frames.length} Frame{frames.length !== 1 ? 's' : ''} in store
           </span>
         </div>
@@ -365,7 +373,7 @@ export default function Home() {
         {loading && (
           <div className="py-20 flex flex-col items-center justify-center space-y-3">
             <div className="w-10 h-10 border-4 border-sky-600 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-slate-600 text-sm font-medium">Loading frames...</p>
+            <p className="text-stone-500 text-sm font-medium">Loading frames...</p>
           </div>
         )}
 
@@ -395,13 +403,14 @@ export default function Home() {
 
         {/* Frames Grid */}
         {!loading && !error && frames.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {frames.map((frame) => (
               <FrameCard key={frame.id} frame={frame} onBookSuccess={handleBookSuccess} />
             ))}
           </div>
         )}
       </section>
+      </div>
     </div>
   );
 }
